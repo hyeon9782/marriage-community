@@ -15,9 +15,11 @@ export default function Header() {
               <Search className="h-5 w-5" />
             </Button>
           </Link>
-          <Button variant="ghost" size="icon" aria-label="내 활동">
-            <User className="h-5 w-5" />
-          </Button>
+          <Link href="/my">
+            <Button variant="ghost" size="icon" aria-label="내 활동">
+              <User className="h-5 w-5" />
+            </Button>
+          </Link>
         </div>
       </div>
     </header>

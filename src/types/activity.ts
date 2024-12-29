@@ -1,0 +1,1 @@
+export type ActivityTab = '작성글' | '댓글' | '좋아요' | '저장'; 
