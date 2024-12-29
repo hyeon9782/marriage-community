@@ -10,9 +10,11 @@ export default function Header() {
           결혼정보
         </Link>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" aria-label="검색">
-            <Search className="h-5 w-5" />
-          </Button>
+          <Link href="/search">
+            <Button variant="ghost" size="icon" aria-label="검색">
+              <Search className="h-5 w-5" />
+            </Button>
+          </Link>
           <Button variant="ghost" size="icon" aria-label="내 활동">
             <User className="h-5 w-5" />
           </Button>
