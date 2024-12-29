@@ -80,7 +80,7 @@ export default function Home() {
           currentCategory={category}
           onCategoryChange={setCategory}
         />
-        <div className='flex flex-col gap-4 mt-4'>
+        <div className='flex flex-col gap-4 mt-4 px-5'>
           {posts.map((post, index) => {
             if (posts.length === index + 1) {
               return (

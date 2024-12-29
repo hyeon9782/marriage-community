@@ -4,4 +4,5 @@ export interface Comment {
   author: string;
   createdAt: Date;
   postId: string;
+  parentId?: string;
 } 

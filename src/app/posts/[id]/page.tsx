@@ -10,11 +10,19 @@ import Link from 'next/link';
 import CommentInput from '@/components/comments/CommentInput';
 import CommentItem from '@/components/comments/CommentItem';
 import { Comment } from '@/types/comment';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
 export default function PostDetail({ params }: { params: { id: string } }) {
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const currentUser = '사용자'; // 실제 구현 시에는 인증 상태에서 가져옴
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -48,7 +56,6 @@ export default function PostDetail({ params }: { params: { id: string } }) {
   }, [params.id]);
 
   const handleCommentSubmit = (content: string) => {
-    // 실제 구현 시에는 API 호출
     const newComment: Comment = {
       id: Date.now().toString(),
       content,
@@ -59,6 +66,54 @@ export default function PostDetail({ params }: { params: { id: string } }) {
     
     setComments(prev => [newComment, ...prev]);
   };
+
+  const handleReplySubmit = (content: string, parentId: string) => {
+    const newReply: Comment = {
+      id: Date.now().toString(),
+      content,
+      author: '사용자',
+      createdAt: new Date(),
+      postId: params.id,
+      parentId,
+    };
+    
+    setComments(prev => [newReply, ...prev]);
+  };
+
+  // 댓글과 답글을 구분하여 정리
+  const organizedComments = comments.reduce((acc, comment) => {
+    if (!comment.parentId) {
+      const replies = comments.filter(reply => reply.parentId === comment.id);
+      acc.push({ ...comment, replies });
+    }
+    return acc;
+  }, [] as (Comment & { replies: Comment[] })[]);
+
+  const handleAction = (action: string) => {
+    switch (action) {
+      case '수정하기':
+        // 수정 로직
+        break;
+      case '삭제하기':
+        // 삭제 로직
+        break;
+      case '신고하기':
+        // 신고 로직
+        break;
+      case '차단하기':
+        // 차단 로직
+        break;
+      case '답글달기':
+        // 답글 로직
+        break;
+    }
+    setDrawerOpen(false);
+  };
+
+  const isMyPost = post?.author === currentUser;
+  const actions = isMyPost
+    ? ['답글달기', '수정하기', '삭제하기']
+    : ['답글달기', '신고하기', '차단하기'];
 
   if (loading) {
     return (
@@ -86,9 +141,45 @@ export default function PostDetail({ params }: { params: { id: string } }) {
               <ChevronLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <Button variant="ghost" size="icon">
-            <MoreHorizontal className="h-5 w-5" />
-          </Button>
+          {post && (
+            <span className="font-medium absolute left-1/2 -translate-x-1/2">
+              {post.category}
+            </span>
+          )}
+          <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+            <DrawerTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreHorizontal className="h-5 w-5" />
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <div className="p-4">
+                <h4 className="font-medium text-center mb-4">
+                  {isMyPost ? '게시글 관리' : '게시글 메뉴'}
+                </h4>
+                <div className="space-y-2">
+                  {actions.map((action) => (
+                    <Button
+                      key={action}
+                      variant="ghost"
+                      className="w-full justify-start h-12 text-base"
+                      onClick={() => handleAction(action)}
+                    >
+                      {action}
+                    </Button>
+                  ))}
+                </div>
+                <DrawerClose asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full mt-4"
+                  >
+                    취소
+                  </Button>
+                </DrawerClose>
+              </div>
+            </DrawerContent>
+          </Drawer>
         </div>
       </header>
 
@@ -137,8 +228,13 @@ export default function PostDetail({ params }: { params: { id: string } }) {
             댓글 {comments.length}개
           </h2>
           <div className="divide-y">
-            {comments.map((comment) => (
-              <CommentItem key={comment.id} comment={comment} />
+            {organizedComments.map((comment) => (
+              <CommentItem 
+                key={comment.id} 
+                comment={comment}
+                replies={comment.replies}
+                onReplySubmit={handleReplySubmit}
+              />
             ))}
             {comments.length === 0 && (
               <p className="py-20 text-center text-muted-foreground">

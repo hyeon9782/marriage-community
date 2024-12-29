@@ -57,34 +57,32 @@ export default function MyActivityPage() {
       </header>
 
       {/* 탭 */}
-      <div className="fixed top-14 left-0 right-0 bg-background z-40">
-        <div className="max-w-screen-md mx-auto">
-          <Tabs
-            defaultValue="작성글"
-            value={currentTab}
-            onValueChange={(value) => setCurrentTab(value as ActivityTab)}
-            className="w-full"
-          >
-            <TabsList className="w-full h-12">
-              <TabsTrigger value="작성글" className="flex-1">
-                작성글
-              </TabsTrigger>
-              <TabsTrigger value="댓글" className="flex-1">
-                댓글
-              </TabsTrigger>
-              <TabsTrigger value="좋아요" className="flex-1">
-                좋아요
-              </TabsTrigger>
-              <TabsTrigger value="저장" className="flex-1">
-                저장
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
+      <div className="fixed top-14 w-full md:w-[375px] bg-background z-40">
+        <Tabs
+          defaultValue="작성글"
+          value={currentTab}
+          onValueChange={(value) => setCurrentTab(value as ActivityTab)}
+          className="w-full"
+        >
+          <TabsList className="w-full h-12">
+            <TabsTrigger value="작성글" className="flex-1">
+              작성글
+            </TabsTrigger>
+            <TabsTrigger value="댓글" className="flex-1">
+              댓글
+            </TabsTrigger>
+            <TabsTrigger value="좋아요" className="flex-1">
+              좋아요
+            </TabsTrigger>
+            <TabsTrigger value="저장" className="flex-1">
+              저장
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       {/* 본문 */}
-      <div className="max-w-screen-md mx-auto pt-[106px] p-4">
+      <div className="pt-[106px] p-4">
         {loading ? (
           <LoadingSpinner />
         ) : posts.length > 0 ? (
