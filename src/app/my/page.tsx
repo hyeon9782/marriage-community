@@ -43,8 +43,8 @@ export default function MyActivityPage() {
   return (
     <main className="min-h-screen bg-background">
       {/* 헤더 */}
-      <header className="fixed top-0 left-0 right-0 h-14 border-b bg-background z-50">
-        <div className="max-w-screen-md mx-auto px-4 h-full flex items-center justify-between">
+      <header className="fixed top-0 w-full md:w-[375px] h-14 border-b bg-background z-50">
+        <div className="px-4 h-full flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Link href="/">
               <Button variant="ghost" size="icon">

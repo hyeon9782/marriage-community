@@ -98,8 +98,8 @@ export default function WritePage() {
   return (
     <main className="min-h-screen bg-background">
       {/* 헤더 */}
-      <header className="fixed top-0 left-0 right-0 h-14 border-b bg-background z-50">
-        <div className="max-w-screen-md mx-auto px-4 h-full flex items-center justify-between">
+      <header className="fixed top-0 w-full md:w-[375px] h-14 border-b bg-background z-50">
+        <div className="px-4 h-full flex items-center justify-between">
           <Link href="/">
             <Button variant="ghost" size="icon" className="mr-2">
               <ChevronLeft className="h-5 w-5" />
@@ -115,7 +115,7 @@ export default function WritePage() {
       </header>
 
       {/* 작성 폼 */}
-      <div className="max-w-screen-md mx-auto pt-14 p-4">
+      <div className="pt-14">
         <div className="space-y-4">
           <Select
             value={category}

@@ -75,7 +75,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background">
       <Header />
-      <div className="max-w-screen-md mx-auto pt-14">
+      <div className="pt-14">
         <CategoryTabs 
           currentCategory={category}
           onCategoryChange={setCategory}
@@ -102,7 +102,12 @@ export default function Home() {
       <Link href="/posts/write">
         <Button 
           size="icon"
-          className="fixed right-4 bottom-4 h-14 w-14 rounded-full shadow-lg"
+          className="fixed bottom-4 right-4 h-14 w-14 rounded-full shadow-lg z-50"
+          style={{ 
+            right: typeof window !== 'undefined' && window.innerWidth >= 768 
+              ? 'calc(50% - 375px/2 + 16px)' 
+              : '16px'
+          }}
           aria-label="글쓰기"
         >
           <Plus className="h-6 w-6" />

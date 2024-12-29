@@ -19,8 +19,8 @@ export default function CommentInput({ postId, onSubmit }: CommentInputProps) {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 border-t bg-background p-4">
-      <div className="max-w-screen-md mx-auto flex gap-2">
+    <div className="fixed bottom-0 w-full md:w-[375px] border-t bg-background p-4">
+      <div className="flex gap-2">
         <Textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
