@@ -9,6 +9,7 @@ import { Category, Post } from '@/types/post';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { generateMockPosts } from '@/lib/utils';
+import Link from 'next/link';
 
 const POSTS_PER_PAGE = 10;
 
@@ -98,13 +99,15 @@ export default function Home() {
           )}
         </div>
       </div>
-      <Button 
-        size="icon"
-        className="fixed right-4 bottom-4 h-14 w-14 rounded-full shadow-lg"
-        aria-label="글쓰기"
-      >
-        <Plus className="h-6 w-6" />
-      </Button>
+      <Link href="/posts/write">
+        <Button 
+          size="icon"
+          className="fixed right-4 bottom-4 h-14 w-14 rounded-full shadow-lg"
+          aria-label="글쓰기"
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
+      </Link>
     </main>
   );
 }

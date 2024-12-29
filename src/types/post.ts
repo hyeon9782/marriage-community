@@ -12,4 +12,19 @@ export interface Post {
   createdAt: Date;
   hasImage: boolean;
   hasVote: boolean;
+}
+
+export interface UploadedImage {
+  id: string;
+  url: string;
+  file: File;
+}
+
+export interface VoteItem {
+  id: string;
+  text: string;
+}
+
+export interface IVote {
+  items: VoteItem[];
 } 
