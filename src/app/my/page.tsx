@@ -3,32 +3,32 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
 import PostCard from '@/components/home/PostCard';
 import LoadingSpinner from '@/components/home/LoadingSpinner';
 import { Post } from '@/types/post';
-import { ActivityTab } from '@/types/activity';
 import { generateMockPosts } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import ActivityPostCard from '@/components/my/ActivityPostCard';
+
+type ActivityTab = '작성한 글' | '좋아요한 글' | '북마크한 글' | '댓글단 글';
 
 export default function MyActivityPage() {
-  const [currentTab, setCurrentTab] = useState<ActivityTab>('작성글');
+  const [currentTab, setCurrentTab] = useState<ActivityTab>('작성한 글');
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const tabs: ActivityTab[] = ['작성한 글', '좋아요한 글', '북마크한 글', '댓글단 글'];
 
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
       try {
-        // 실제 구현 시에는 API 호출
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // 임시 데이터 생성
         const mockPosts = generateMockPosts(0, 5).map(post => ({
           ...post,
-          author: '사용자', // 현재 사용자로 설정
+          author: '사용자',
         }));
-        
         setPosts(mockPosts);
       } catch (error) {
         console.error('Failed to fetch posts:', error);
@@ -45,58 +45,56 @@ export default function MyActivityPage() {
       {/* 헤더 */}
       <header className="fixed top-0 w-full md:w-[375px] h-14 border-b bg-background z-50">
         <div className="px-4 h-full flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/">
-              <Button variant="ghost" size="icon">
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-            </Link>
-            <h1 className="font-bold text-lg">내 활동</h1>
-          </div>
+          <Link href="/">
+            <Button variant="ghost" size="icon">
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+          </Link>
+          <h1 className="font-bold text-lg absolute left-1/2 -translate-x-1/2">
+            내 활동
+          </h1>
+          <div className="w-10" /> {/* 중앙 정렬을 위한 여백 */}
         </div>
       </header>
 
       {/* 탭 */}
-      <div className="fixed top-14 w-full md:w-[375px] bg-background z-40">
-        <Tabs
-          defaultValue="작성글"
-          value={currentTab}
-          onValueChange={(value) => setCurrentTab(value as ActivityTab)}
-          className="w-full"
-        >
-          <TabsList className="w-full h-12">
-            <TabsTrigger value="작성글" className="flex-1">
-              작성글
-            </TabsTrigger>
-            <TabsTrigger value="댓글" className="flex-1">
-              댓글
-            </TabsTrigger>
-            <TabsTrigger value="좋아요" className="flex-1">
-              좋아요
-            </TabsTrigger>
-            <TabsTrigger value="저장" className="flex-1">
-              저장
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+      <div className="fixed top-14 w-full md:w-[375px] bg-background z-40 border-b">
+        <div className="">
+          <div className="flex whitespace-nowrap px-4">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setCurrentTab(tab)}
+                className={cn(
+                  "py-3 px-2 mr-4 relative text-sm",
+                  "text-muted-foreground hover:text-foreground transition-colors",
+                  currentTab === tab && "text-foreground font-medium",
+                  currentTab === tab && "after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-foreground"
+                )}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* 본문 */}
-      <div className="pt-[106px] p-4">
+      {/* 게시글 목록 */}
+      <div className="pt-[106px] px-4">
         {loading ? (
           <LoadingSpinner />
         ) : posts.length > 0 ? (
-          <div className="space-y-4 flex flex-col gap-2 mt-4">
+          <div className="divide-y">
             {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <ActivityPostCard key={post.id} post={post} />
             ))}
           </div>
         ) : (
           <div className="py-20 text-center text-muted-foreground">
-            {currentTab === '작성글' && '작성한 글이 없습니다.'}
-            {currentTab === '댓글' && '작성한 댓글이 없습니다.'}
-            {currentTab === '좋아요' && '좋아요한 글이 없습니다.'}
-            {currentTab === '저장' && '저장한 글이 없습니다.'}
+            {currentTab === '작성한 글' && '작성한 글이 없습니다.'}
+            {currentTab === '좋아요한 글' && '좋아요한 글이 없습니다.'}
+            {currentTab === '북마크한 글' && '북마크한 글이 없습니다.'}
+            {currentTab === '댓글단 글' && '댓글단 글이 없습니다.'}
           </div>
         )}
       </div>

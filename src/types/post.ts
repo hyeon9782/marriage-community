@@ -1,4 +1,4 @@
-export type Category = '전체' | '고민' | '질문' | '자유';
+export type Category = '전체'| '인기'| '질문'| '팁/정보'| '견적'| '자유'
 
 export interface Post {
   id: string;

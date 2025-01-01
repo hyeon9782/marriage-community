@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Header from '@/components/layout/Header';
-import CategoryTabs from '@/components/home/CategoryTabs';
 import PostCard from '@/components/home/PostCard';
 import LoadingSpinner from '@/components/home/LoadingSpinner';
 import { Category, Post } from '@/types/post';
@@ -10,8 +9,11 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { generateMockPosts } from '@/lib/utils';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 const POSTS_PER_PAGE = 10;
+
+const categories: Category[] = ['전체', '인기', '질문', '팁/정보', '견적', '자유'];
 
 export default function Home() {
   const [category, setCategory] = useState<Category>('전체');
@@ -60,7 +62,6 @@ export default function Home() {
         );
         
         setPosts(prev => [...prev, ...newPosts]);
-        // 필터링된 결과가 없거나 적을 수 있으므로, 더 많은 페이지를 로드
         setHasMore(newPosts.length === POSTS_PER_PAGE && page < 10);
       } catch (error) {
         console.error('Failed to load posts:', error);
@@ -75,12 +76,32 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background">
       <Header />
-      <div className="pt-14">
-        <CategoryTabs 
-          currentCategory={category}
-          onCategoryChange={setCategory}
-        />
-        <div className='flex flex-col gap-4 mt-4 px-5'>
+      
+      {/* 카테고리 탭 */}
+      <div className="fixed top-14 w-full md:w-[375px] bg-background z-40 border-b">
+        <div className="">
+          <div className="flex whitespace-nowrap px-4">
+            {categories.map((item) => (
+              <button
+                key={item}
+                onClick={() => setCategory(item)}
+                className={cn(
+                  "py-3 px-2 mr-4 relative",
+                  "text-muted-foreground hover:text-foreground transition-colors",
+                  category === item && "text-foreground font-medium",
+                  category === item && "after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-foreground"
+                )}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 게시글 목록 */}
+      <div className="pt-[106px] px-4">
+        <div className="space-y-4">
           {posts.map((post, index) => {
             if (posts.length === index + 1) {
               return (
@@ -99,6 +120,8 @@ export default function Home() {
           )}
         </div>
       </div>
+
+      {/* 글쓰기 버튼 */}
       <Link href="/posts/write">
         <Button 
           size="icon"

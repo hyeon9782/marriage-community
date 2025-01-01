@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button';
 
 export default function Header() {
   return (
-    <header className="fixed top-0 w-full md:w-[375px] h-14 border-b bg-background z-50">
-      <div className="px-4 h-full flex items-center justify-between">
+    <header className="fixed top-0 w-full md:w-[375px] h-14 bg-background z-50">
+      <div className="px-5 h-full flex items-center justify-between">
         <Link href="/" className="font-bold text-xl">
-          결혼정보
+          커뮤니티
         </Link>
         <div className="flex items-center gap-2">
           <Link href="/search">

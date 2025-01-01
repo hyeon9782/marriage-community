@@ -1,98 +1,48 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Image as ImageIcon, Vote, X } from 'lucide-react';
+import { ChevronLeft, X, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import Link from 'next/link';
-import { Category, UploadedImage, IVote } from '@/types/post';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+
+type Category = '질문' | '팁/정보' | '견적' | '자유';
 
 export default function WritePage() {
   const router = useRouter();
-  const imageInputRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [category, setCategory] = useState<Exclude<Category, '전체'> | ''>('');
   const [submitting, setSubmitting] = useState(false);
-  const [images, setImages] = useState<UploadedImage[]>([]);
-  const [vote, setVote] = useState<IVote | null>(null);
+  const [category, setCategory] = useState<Category | ''>('');
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // 투표 데이터 불러오기
-  useEffect(() => {
-    const tempVote = localStorage.getItem('tempVote');
-    if (tempVote) {
-      setVote(JSON.parse(tempVote));
-      localStorage.removeItem('tempVote');
-    }
-  }, []);
+  const categories: Category[] = ['질문', '팁/정보', '견적', '자유'];
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-
-    // 최대 3개까지만 업로드 가능
-    if (images.length + files.length > 3) {
-      alert('이미지는 최대 3개까지 업로드할 수 있습니다.');
-      return;
-    }
-
-    // 파일을 UploadedImage 형태로 변환
-    Array.from(files).forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          setImages(prev => [...prev, {
-            id: Date.now().toString(),
-            url: e.target.result as string,
-            file
-          }]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
-
-    // input 초기화
-    if (imageInputRef.current) {
-      imageInputRef.current.value = '';
-    }
-  };
-
-  const removeImage = (id: string) => {
-    setImages(prev => prev.filter(image => image.id !== id));
+  const handleCategorySelect = (selected: Category) => {
+    setCategory(selected);
+    setDrawerOpen(false);
   };
 
   const handleSubmit = async () => {
-    if (!category || !title.trim() || !content.trim()) {
-      alert('모든 필드를 입력해주세요.');
-      return;
-    }
-
+    if (!title.trim() || !content.trim() || !category) return;
     setSubmitting(true);
+    
     try {
-      // 실제 구현 시에는 API 호출
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const tempId = Date.now().toString();
-      router.push(`/posts/${tempId}`);
+      // API 호출 로직
+      router.push('/');
     } catch (error) {
-      console.error('Failed to create post:', error);
-      alert('게시글 작성에 실패했습니다.');
+      console.error('Failed to submit:', error);
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const removeVote = () => {
-    setVote(null);
   };
 
   return (
@@ -101,125 +51,98 @@ export default function WritePage() {
       <header className="fixed top-0 w-full md:w-[375px] h-14 border-b bg-background z-50">
         <div className="px-4 h-full flex items-center justify-between">
           <Link href="/">
-            <Button variant="ghost" size="icon" className="mr-2">
-              <ChevronLeft className="h-5 w-5" />
+            <Button variant="ghost" size="icon">
+              <X className="h-5 w-5" />
             </Button>
           </Link>
           <Button 
-            onClick={handleSubmit} 
-            disabled={submitting || !category || !title.trim() || !content.trim()}
+            variant="ghost" 
+            className="font-medium"
+            onClick={handleSubmit}
+            disabled={submitting || !title.trim() || !content.trim() || !category}
           >
-            {submitting ? '작성 중...' : '작성하기'}
+            등록
           </Button>
         </div>
       </header>
 
-      {/* 작성 폼 */}
+      {/* 본문 */}
       <div className="pt-14">
-        <div className="space-y-4">
-          <Select
-            value={category}
-            onValueChange={(value: Exclude<Category, '전체'>) => setCategory(value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="카테고리 선택" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="고민">고민</SelectItem>
-              <SelectItem value="질문">질문</SelectItem>
-              <SelectItem value="자유">자유</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="p-4 space-y-4">
+          {/* 카테고리 선택 */}
+          <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+            <DrawerTrigger asChild>
+              <div className="flex items-center justify-between border-b py-3">
+                <span className="text-muted-foreground">
+                  {category || '카테고리를 선택해주세요.'}
+                </span>
+                <ChevronLeft className="h-5 w-5 rotate-180 text-muted-foreground" />
+              </div>
+            </DrawerTrigger>
+            <DrawerContent>
+              <div className="p-4">
+                <h4 className="font-medium text-center mb-4">
+                  카테고리를 선택해주세요.
+                </h4>
+                <div className="space-y-2">
+                  {categories.map((item) => (
+                    <Button
+                      key={item}
+                      variant="ghost"
+                      className="w-full justify-start h-12 text-base"
+                      onClick={() => handleCategorySelect(item)}
+                    >
+                      {item}
+                    </Button>
+                  ))}
+                </div>
+                <DrawerClose asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full mt-4"
+                  >
+                    취소
+                  </Button>
+                </DrawerClose>
+              </div>
+            </DrawerContent>
+          </Drawer>
 
-          <Input
-            placeholder="제목을 입력하세요"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+          {/* 제목 입력 */}
+          <div className="border-b">
+            <Input
+              type="text"
+              placeholder="제목을 입력해주세요."
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="border-none text-lg placeholder:text-muted-foreground focus-visible:ring-0"
+            />
+          </div>
 
+          {/* 내용 입력 */}
           <Textarea
-            placeholder="내용을 입력하세요"
+            placeholder="내용을 입력해주세요.
+
+타인에게 불쾌감을 주거나 비방 등 부적절한 게시물은 삭제될 수 있으며, 신고나 의견 커뮤니티 이용이 제한될 수 있어요.
+
+- 복사, 도용, 명예훼손 등 부적절한 내용
+- 지나치게 불쾌감을 주는진한 내용
+- 기타 플랫폼을 위법하는 내용"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="min-h-[300px] resize-none"
+            className="min-h-[300px] resize-none border-none placeholder:text-muted-foreground focus-visible:ring-0"
           />
+        </div>
 
-          {/* 투표 미리보기 */}
-          {vote && (
-            <div className="border rounded-lg p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="font-medium">투표</h3>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={removeVote}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="space-y-2">
-                {vote.items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="p-3 bg-muted rounded-lg"
-                  >
-                    {item.text}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 이미지 미리보기 */}
-          {images.length > 0 && (
-            <div className="grid grid-cols-3 gap-2">
-              {images.map(image => (
-                <div key={image.id} className="relative aspect-square">
-                  <img
-                    src={image.url}
-                    alt="업로드 이미지"
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-1 right-1 h-6 w-6"
-                    onClick={() => removeImage(image.id)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* 하단 버튼 */}
-          <div className="flex gap-2">
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              className="hidden"
-              ref={imageInputRef}
-              onChange={handleImageUpload}
-            />
-            <Button
-              variant="outline"
-              type="button"
-              onClick={() => imageInputRef.current?.click()}
-              disabled={images.length >= 3}
-            >
-              <ImageIcon className="h-5 w-5 mr-2" />
-              사진
+        {/* 하단 버튼 */}
+        <div className="fixed bottom-0 w-full md:w-[375px] border-t bg-background">
+          <div className="p-4 flex gap-2">
+            <Button variant="outline" className="flex-1">
+              <ImageIcon className="h-5 w-5" />
             </Button>
-            {!vote && (
-              <Link href="/posts/write/vote">
-                <Button variant="outline" type="button">
-                  <Vote className="h-5 w-5 mr-2" />
-                  투표
-                </Button>
-              </Link>
-            )}
+            <Button variant="outline" className="flex-1">
+              투표
+            </Button>
           </div>
         </div>
       </div>
